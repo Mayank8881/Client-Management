@@ -343,7 +343,9 @@ interface SortCriterion {
     direction: 'asc' | 'desc';
 }
 
-const fetcher = (url: string) => axios.get<Client[]>(url).then(res => res.data);
+// const fetcher = (url: string) => axios.get<Client[]>(url).then(res => res.data);
+const fetcher = (url: string): Promise<Client[]> =>
+  Promise.resolve(axios.get<Client[]>(url).then(res => res.data));
 
 const ClientTable = () => {
     const { data: clients, mutate } = useSWR<Client[]>('/api/clients', fetcher);
@@ -601,7 +603,7 @@ const SortPanel = ({ criteria, onAdd, onRemove, onToggle, onDragEnd }: SortPanel
             </div>
 
             <DndContext sensors={sensors} onDragEnd={onDragEnd}>
-                <SortableContext items={criteria} strategy={verticalListSortingStrategy}>
+                <SortableContext items={criteria.map(c => c.field)} strategy={verticalListSortingStrategy}>
                     <motion.div layout className="space-y-2">
                         {criteria.map((criterion, index) => (
                             <SortableItem
